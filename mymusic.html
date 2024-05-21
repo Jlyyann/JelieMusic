@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html style="background-image: url('Jelmusic/songpic.jpg'); background-size: cover; background-position: center;">
+<head>
+  <title>Elle's Beat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    .text-overlay {
+      position: absolute;
+      top: 10px;
+      left: 150px;
+      color: pink;
+      font-family: 'Lucida Handwriting', cursive;
+      font-size: 200px;
+      line-height: 2;
+      font-weight: bold;
+    }
+    .image-container {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; 
+      height: 700px;
+      background-color: rgba(255, 255, 255, 0.3);
+      border: 2px solid pink;
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 30px;
+    }
+    .player-container {
+      position: fixed;
+      bottom: 400px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.3);
+      padding: 80px;
+      border-radius: 60px;
+      backdrop-filter: blur(70px);
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+    }
+    .control-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 100px;
+      color: pink;
+      margin: 0 18px;
+    }
+    .time-slider {
+      width: 500px;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.5);
+      position: relative;
+      border-radius: 60px;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+    .time-slider .progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: pink;
+      border-radius: 80px;
+      width: 0%;
+    }
+    .time-display {
+      color: pink;
+      font-size: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="text-overlay">Elle's Beat</div>
+
+  <div class="image-container">
+    <img id="centralImage" src="Jelmusic/hideawaypic.jpg" alt="Central Image">
+  </div>
+
+  <div class="player-container">
+    <div class="controls">
+      <button class="control-button" id="prev"><i class="fas fa-backward"></i></button>
+      <button class="control-button play-pause" id="playPause"><i class="fas fa-play"></i></button>
+      <button class="control-button" id="next"><i class="fas fa-forward"></i></button>
+    </div>
+    <div class="time-slider" id="timeSlider">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+  </div>
+
+  <audio id="audioPlayer" src="Jelmusic/hideaway.mp3"></audio>
+
+  <script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playPauseButton = document.getElementById('playPause');
+    const timeSlider = document.getElementById('timeSlider');
+    const progress = document.getElementById('progress');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const centralImage = document.getElementById('centralImage');
+    const nextButton = document.getElementById('next');
+
+    let isPlaying = false;
+
+    const tracks = [
+      {
+        src: 'Jelmusic/hideaway.mp3',
+        img: 'Jelmusic/hideawaypic.jpg',
+        duration: '3:30'
+      },
+      {
+        src: 'Jelmusic/homebody.mp3',
+        img: 'Jelmusic/homebodypic.jpg',
+        duration: '4:00'
+      },
+      {
+        src: 'Jelmusic/popular.mp3',
+        img: 'Jelmusic/popularpic.jpg',
+        duration: '4:00'
+      }
+      
+      // Add more tracks as needed
+    ];
+
+    let currentTrackIndex = 0;
+
+    playPauseButton.addEventListener('click', function() {
+      if (isPlaying) {
+        audioPlayer.pause();
+        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+      } else {
+        audioPlayer.play();
+        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+      }
+      isPlaying = !isPlaying;
+    });
+
+    audioPlayer.addEventListener('timeupdate', function() {
+      const currentTime = audioPlayer.currentTime;
+      const duration = audioPlayer.duration;
+      const progressPercent = (currentTime / duration) * 100;
+      progress.style.width = `${progressPercent}%`;
+      timeDisplay.innerHTML = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+    });
+
+    timeSlider.addEventListener('click', function(event) {
+      const sliderWidth = timeSlider.clientWidth;
+      const clickPosition = event.offsetX;
+      const newTime = (clickPosition / sliderWidth) * audioPlayer.duration;
+      audioPlayer.currentTime = newTime;
+    });
+
+    nextButton.addEventListener('click', function() {
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      const currentTrack = tracks[currentTrackIndex];
+      audioPlayer.src = currentTrack.src;
+      centralImage.src = currentTrack.img;
+      timeDisplay.innerHTML = `0:00 / ${currentTrack.duration}`;
+      progress.style.width = '0%';
+      if (isPlaying) {
+        audioPlayer.play();
+      }
+    });
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+  </script>
+</body>
+</html>
